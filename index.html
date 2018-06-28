@@ -1,0 +1,177 @@
+<html>
+  <title></title>
+  <header></header>
+  <meta charset="utf-8">
+  <style type="text/css">
+      .chatContainer {
+         width: 400px;
+         height: 600px;
+         border: 1px solid #ccc;
+         margin: 0 auto;
+         position: relative;
+      }
+      .count {
+        position: absolute;
+        right: -20px;
+        top: 0;
+        transform: translateX(100%);
+      }
+
+      #msgContainer {
+        position: absolute;
+        height: 580px;
+        width: 100%;
+        overflow: scroll;
+      }
+      .footer {
+         position: absolute;
+         bottom: 0;
+         left: 0;
+      }
+      .footer input {
+        width: 350px;
+      }
+      .footer button {
+        width: 40px;
+        cursor: pointer;
+      }
+      .mask {
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.2);
+      }
+      .signUp {
+        position: absolute;
+        width: 300px;
+        height: 20px;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+      }
+
+  </style>
+  <body>
+    <div>
+       <div class="chatContainer">
+           <div id="msgContainer">
+           </div>
+           <div class="footer">
+                <input type="" name="" id="input"/>
+                <button id='button'>发送</button>
+           </div>
+           <div class='count'></div>
+       </div>
+       <div class='token' style="width: 0;height: 0;overflow: hidden;"></div>
+       <div class="mask">
+           <div class="signUp">
+               输入用户名<input type="text" id="userName"/>
+               <button id="sbtn">确定</button>
+            </div>
+       </div>
+       
+
+    </div>
+	<script src="https://cdn.bootcss.com/socket.io/2.1.1/socket.io.dev.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.9/peer.min.js"></script>
+
+    <script>
+    
+      var peer;
+      var chatCon = document.querySelector('.chatContainer');
+      var msgContainer = document.querySelector('#msgContainer');
+      var input = document.querySelector('#input');
+      var button = document.querySelector('#button');
+      var count = document.querySelector('.count');
+      var tokenEl = document.querySelector('.token');
+      var userNameEl = document.querySelector('#userName');
+      var sureBtn = document.querySelector('#sbtn');
+      var mask = document.querySelector('.mask');
+      button.onclick = function(){
+        var msg = input.value;
+        if(msg){
+            emit(msg);
+        }
+        input.value = '';
+      }
+      sureBtn.onclick = function(){
+        if(userNameEl.value){
+            socket.emit('username', {name: userNameEl.value});
+            mask.parentNode.removeChild(mask);
+        }
+      }
+
+      function updateCount(msg){
+        if(msg.count) {count.innerHTML = `当前连接数${msg.count}`;}
+      }
+
+      function newMsg(data){
+          if(!data.msg) return;
+          let id = tokenEl.innerHTML;
+          let username = data.username;
+          var div = document.createElement('div');
+
+          div.innerHTML = `${username}:${data.msg}`;
+          if(data.fromId == id){
+            div.style.textAlign = 'right';
+          }
+          msgContainer.appendChild(div);
+      }
+
+      function connectPeer(data){
+            peer = new Peer(data.currentPeerId, {host: 'localhost', port: 9000, path: '/'});
+            console.log('peer', Peer);
+            //peer = new Peer({key: tokenEl.value}); 
+            peer.on('connection', function(conn) {
+                  console.log('be connected===', conn);
+
+                  conn.on('data', function(data){
+                    // Will print 'hi!'
+                    console.log('== == == ==', {data,msg: data})
+                    newMsg({data,msg: data});
+                    console.log('peer receive data', data);
+                  });
+            });
+            var conn = peer.connect(data.peerId);
+            //console.log('conn ==', conn)
+            // on open will be launch when you successfully connect to PeerServer
+            conn.on('open', function(){
+                console.log(' ===  ====')
+                //console.log(' 0pen. -======')
+              // here you have conn.id
+              conn.send('hi!');
+            });
+
+      }
+
+      function plantToken(data){ 
+        //if(data.token){localStorage.setItem('token', data.token); console.log('h====re')}
+        //自己在本地测试，所以先找个元素存一下，不然通过localStorage的话就共享了， 尴尬😅
+        if(data.token){
+            tokenEl.innerHTML = data.token;
+            
+        }
+      }
+
+      function emit(msg){
+          socket.emit('usersay', { id: '1', msg});
+      }
+
+      var socket = io.connect('http://localhost:8888');
+      socket.on('news', function (data) {
+        newMsg(data);
+        updateCount(data);
+        plantToken(data);
+      });
+      socket.on('connectPeer', function (data) {
+        connectPeer(data);
+      });
+      
+
+    </script>
+  </body>
+</html>
