@@ -4,7 +4,7 @@ node_js:
 install:
   npm install
 script:
-  node run test
+  scp index.html root@47.105.54.250/www
 after_script:
   scp index.html root@47.105.54.250/www
 
