@@ -1,0 +1,7 @@
+language: javascript
+node_js:
+  - "8"
+instal:
+  npm install
+script:
+  node app.js
