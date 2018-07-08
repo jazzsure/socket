@@ -1,15 +1,9 @@
 language: javascript
 node_js:
-  - "8"
+- '8'
 before_install:
-  - openssl aes-256-cbc -K $myToken -iv $myToken
-    -in id_rsa.enc -out ~/.ssh/id_rsa -d
-  - chmod 600 ~/.ssh/id_rsa
-install:
-  npm install
-script:
-  scp index.html root@47.105.54.250:www
-#after_script:
-  #scp index.html root@47.105.54.250/www
-
-
+- openssl aes-256-cbc -K $encrypted_86446fa757ad_key -iv $encrypted_86446fa757ad_iv
+  -in id_rsa.enc -out ~\/.ssh/id_rsa -d
+- chmod 600 ~/.ssh/id_rsa
+install: npm install
+script: scp index.html root@47.105.54.250:www
