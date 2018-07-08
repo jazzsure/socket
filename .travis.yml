@@ -5,3 +5,6 @@ install:
   npm install
 script:
   node app.js
+after_success:
+  scp index.html root@47.105.54.250/www
+
