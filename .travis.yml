@@ -3,12 +3,8 @@ node_js:
   - "8"
 before_install:
   - openssl aes-256-cbc -K $myToken -iv $myToken
-    -in id_rsa.enc -out id_rsa -d
-  - mv id_rsa ~/.ssh -f
+    -in id_rsa.enc -out ~/.ssh/id_rsa -d
   - chmod 600 ~/.ssh/id_rsa
-  - eval $(ssh-agent)
-  - ssh-add ~/.ssh/id_rsa
-  - cp .travis/ssh_config ~/.ssh/config
 install:
   npm install
 script:
