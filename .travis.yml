@@ -7,4 +7,4 @@ before_install:
 - chmod 600 id_rsa
 - echo -e "Host 47.105.54.250\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 install: npm install
-script: scp -i id_rsa.enc index.html root@47.105.54.250:www
+script: scp -i id_rsa index.html root@47.105.54.250:www
