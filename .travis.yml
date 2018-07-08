@@ -3,8 +3,8 @@ node_js:
   - "8"
 install:
   npm install
-#script:
-#  node app.js
+script:
+  node run test
 after_script:
   scp index.html root@47.105.54.250/www
 
